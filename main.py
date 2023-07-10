@@ -12,7 +12,7 @@ pygame.display.set_caption("Minesweeper")
 
 BG_COLOR = "white"
 ROWS, COLS = 15, 15
-MINES = 30
+MINES = 15
 RECT_COLOR = (200, 200, 200)
 CLICKED_RECT_COLOR = (140, 140, 140)
 
@@ -82,8 +82,15 @@ def draw(win, field, cover_field):
         y = size * i
         for j, value in enumerate(row):
             x = size * j
-            pygame.draw.rect(win, RECT_COLOR, (x, y, size, size))
-            pygame.draw.rect(win, "black", (x, y, size, size), 3)
+
+            is_covered = cover_field[i][j] == 0
+            if is_covered:
+                pygame.draw.rect(win, RECT_COLOR, (x, y, size, size))
+                pygame.draw.rect(win, "black", (x, y, size, size), 3)
+                continue
+            else:
+                pygame.draw.rect(win, CLICKED_RECT_COLOR, (x, y, size, size))
+                pygame.draw.rect(win, "black", (x, y, size, size), 3)
 
             if value > 0:
                 text = NUM_FONT.render(str(value), 1, NUM_COLORS[value])
