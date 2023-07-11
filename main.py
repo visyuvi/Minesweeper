@@ -1,10 +1,12 @@
 import pygame
 import random
-from pprint import PrettyPrinter
+import queue
+
+# from pprint import PrettyPrinter
 
 pygame.init()
 
-printer = PrettyPrinter()
+# printer = PrettyPrinter()
 WIDTH, HEIGHT = 700, 800
 
 win = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -12,7 +14,7 @@ pygame.display.set_caption("Minesweeper")
 
 BG_COLOR = "white"
 ROWS, COLS = 15, 15
-MINES = 15
+MINES = 30
 SIZE = WIDTH / ROWS
 
 RECT_COLOR = (200, 200, 200)
@@ -105,11 +107,30 @@ def get_grid_pos(mouse_pos):
     return row, col
 
 
+def uncover_from_pos(row, col, cover_field, field):
+    q = queue.Queue()
+    q.put((row, col))
+    visited = set()
+
+    while not q.empty():
+        current = q.get()
+
+        neighbours = get_neighbours(*current, ROWS, COLS)
+        for r, c in neighbours:
+            if (r, c) in visited:
+                continue
+            value = field[r][c]
+            cover_field[r][c] = 1
+            if value == 0:
+                q.put((r, c))
+            visited.add((r, c))
+
+
 def main():
     run = True
     field = create_mine_field(ROWS, COLS, MINES)
     cover_field = [[0 for _ in range(COLS)] for _ in range(ROWS)]
-    printer.pprint(field)
+    # printer.pprint(field)
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -123,7 +144,7 @@ def main():
                     continue
 
                 cover_field[row][col] = 1
-
+                uncover_from_pos(row, col, cover_field, field)
         draw(win, field, cover_field)
     pygame.quit()
 
